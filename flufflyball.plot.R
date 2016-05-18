@@ -67,44 +67,61 @@ flufflyball.plot=function(id,group,coord,values, filter=0, cex.circle=6, plot.le
   for (i in min(group):max(group)){ # loop to build a plot for each group
     
     subset.group=group[group==i] # subset of group data
-    max.coord=max(coord[group==i]) # max coord value 
-    norm.angles=(2*pi*coord[group==i])/max.coord # normalized angles for each coord based on max coord value 
-    max.value=max(values.checked) # max value for 'values'
     
-    par(mar=c(0,0,2,0)) # setting margins for each plot
-    
-    plot(0,xlim=c(-max.value,max.value), # empty plot.
-         ylim=c(-max.value,max.value), # lims are defined by max and min values.
-         axes=F, type="n", main=i) # without axes centered on 0,0. group is the main title. 
-    
-    for (ii in 1:length(norm.angles)){ # inside loop to build each spine in the plot
-      
-      radius=values.checked[group==i][ii] # pick a single value "ii" for the group "i"
-      
-      #picking colors according to quartiles
-      if(values.checked[group==i][ii]>=quantile(values.checked[values.checked!=0])[1] & # if value "ii" is bigger than 1st quartile
-         values.checked[group==i][ii]<quantile(values.checked[values.checked!=0])[2]){color.line="#984EA3"} # AND value "ii" is smaller than 2nd quartile
-      if(values.checked[group==i][ii]>=quantile(values.checked[values.checked!=0])[2] & # if value "ii" is bigger than 2nd quartile
-         values.checked[group==i][ii]<quantile(values.checked[values.checked!=0])[3]){color.line="#4DAF4A" } # AND value "ii" is smaller than 3rd quartile
-      if(values.checked[group==i][ii]>=quantile(values.checked[values.checked!=0])[3] & # if value "ii" is bigger than 3rd quartile
-         values.checked[group==i][ii]<quantile(values.checked[values.checked!=0])[4]){color.line="#377EB8"} # AND value "ii" is smaller than 4th quartile
-      if(values.checked[group==i][ii]>=quantile(values.checked[values.checked!=0])[4] & # if value "ii" is bigger than 4th quartile
-         values.checked[group==i][ii]<=quantile(values.checked[values.checked!=0])[5]){color.line="#E41A1C"} # AND value "ii" is smaller than 5th quartile
-      
-      #applying filter parameter and drawing lines
-      if (radius>filter){ #if value>filter value(radius)
-        lines(c(0,sin(norm.angles[ii])*radius),c(0,cos(norm.angles[ii])*radius), col=color.line) #draw the line using picked color and normalized angles
-        filtered.names=append(filtered.names, id[group==i][ii],after=length(filtered.names)) # adding id to filtered values in object "filtered names"
+    #checking if there is a empty i group between min(group) & max(group)
+    if (length(subset.group)==0){
+      plot(0,xlim=c(-1,1), # empty plot.
+           ylim=c(-1,1), # lims are defined by max and min values.
+           axes=F, type="n", main=i) # without axes centered on 0,0. group is the main title. 
+      points(0,0,pch=21,cex=cex.circle, bg="White", col=1)# draw a circle in front of lines using cex.circle user parameter
+      if (plot.legend==TRUE){
+          legend("bottom", c("4th quartile", "3rd quartile", "2nd quartile", "1st quartile"), # legend of 4 quartiles
+                fill=c("#E41A1C", "#377EB8","#4DAF4A","#984EA3"),  # ColorBrewer colors 
+                cex=cex.legend, horiz=TRUE,inset=.02, bg="White", box.lty=0, # horizontal legend without border
+                title=paste(deparse(substitute(values)))) # legend title with vector group name
       }
     }
     
-    points(0,0,pch=21,cex=cex.circle, bg="White", col=1) # draw a circle in front of lines using cex.circle user parameter
+    else{
+      max.coord=max(coord[group==i]) # max coord value 
+      norm.angles=(2*pi*coord[group==i])/max.coord # normalized angles for each coord based on max coord value 
+      max.value=max(values.checked) # max value for 'values'
     
-    if (plot.legend==TRUE){
-      legend("bottom", c("4th quartile", "3rd quartile", "2nd quartile", "1st quartile"), # legend of 4 quartiles
-            fill=c("#E41A1C", "#377EB8","#4DAF4A","#984EA3"),  # ColorBrewer colors 
-            cex=cex.legend, horiz=TRUE,inset=.02, bg="White", box.lty=0, # horizontal legend without border
-            title=paste(deparse(substitute(values)))) # legend title with vector group name
+      par(mar=c(0,0,2,0)) # setting margins for each plot
+    
+      plot(0,xlim=c(-max.value,max.value), # empty plot.
+          ylim=c(-max.value,max.value), # lims are defined by max and min values.
+          axes=F, type="n", main=i) # without axes centered on 0,0. group is the main title. 
+    
+      for (ii in 1:length(norm.angles)){ # inside loop to build each spine in the plot
+      
+        radius=values.checked[group==i][ii] # pick a single value "ii" for the group "i"
+      
+      #picking colors according to quartiles
+        if(values.checked[group==i][ii]>=quantile(values.checked[values.checked!=0])[1] & # if value "ii" is bigger than 1st quartile
+          values.checked[group==i][ii]<quantile(values.checked[values.checked!=0])[2]){color.line="#984EA3"} # AND value "ii" is smaller than 2nd quartile
+        if(values.checked[group==i][ii]>=quantile(values.checked[values.checked!=0])[2] & # if value "ii" is bigger than 2nd quartile
+          values.checked[group==i][ii]<quantile(values.checked[values.checked!=0])[3]){color.line="#4DAF4A" } # AND value "ii" is smaller than 3rd quartile
+        if(values.checked[group==i][ii]>=quantile(values.checked[values.checked!=0])[3] & # if value "ii" is bigger than 3rd quartile
+          values.checked[group==i][ii]<quantile(values.checked[values.checked!=0])[4]){color.line="#377EB8"} # AND value "ii" is smaller than 4th quartile
+        if(values.checked[group==i][ii]>=quantile(values.checked[values.checked!=0])[4] & # if value "ii" is bigger than 4th quartile
+          values.checked[group==i][ii]<=quantile(values.checked[values.checked!=0])[5]){color.line="#E41A1C"} # AND value "ii" is smaller than 5th quartile
+      
+        #applying filter parameter and drawing lines
+        if (radius>filter){ #if value>filter value(radius)
+          lines(c(0,sin(norm.angles[ii])*radius),c(0,cos(norm.angles[ii])*radius), col=color.line) #draw the line using picked color and normalized angles
+          filtered.names=append(filtered.names, id[group==i][ii],after=length(filtered.names)) # adding id to filtered values in object "filtered names"
+        }
+      }
+    
+      points(0,0,pch=21,cex=cex.circle, bg="White", col=1) # draw a circle in front of lines using cex.circle user parameter
+    
+      if (plot.legend==TRUE){
+        legend("bottom", c("4th quartile", "3rd quartile", "2nd quartile", "1st quartile"), # legend of 4 quartiles
+              fill=c("#E41A1C", "#377EB8","#4DAF4A","#984EA3"),  # ColorBrewer colors 
+              cex=cex.legend, horiz=TRUE,inset=.02, bg="White", box.lty=0, # horizontal legend without border
+              title=paste(deparse(substitute(values)))) # legend title with vector group name
+      }
     }
   }
   
